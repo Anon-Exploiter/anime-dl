@@ -111,7 +111,7 @@ def main():
 		commands 	= []
 
 		if args.p:
-			DPROCESSES 	= args.p
+			DPROCESSES 	= int(args.p)
 
 		legitURL 	= checkAnimeURL(url)
 
