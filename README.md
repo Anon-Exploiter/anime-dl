@@ -23,7 +23,7 @@ Python3 script to download subbed animes from 4anime-dl (the site with best qual
 
 ### Where do I get anime list?
 
-Anime list: https://4anime.to/anime/
+**Anime list:** https://4anime.to/anime/
 
 ### Requirements
 - aria2
