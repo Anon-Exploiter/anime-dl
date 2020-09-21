@@ -47,7 +47,7 @@ pip install -r requirements.txt
 python3 4anime.py --url https://4anime.to/anime/mob-psycho-100 --processes 5
 ```
 
-[![asciicast](https://asciinema.org/a/360851.svg)](https://asciinema.org/a/360851)
+[![asciicast](https://asciinema.org/a/360856.svg)](https://asciinema.org/a/360856)
 
 ### Features
 - Fetches information about the anime, title, desc, etc.
