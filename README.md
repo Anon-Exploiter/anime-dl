@@ -13,7 +13,7 @@
 
 Python3 script to download subbed animes from 4anime-dl (the site with best quality i.e. 1080p)
 
-<!--[![asciicast](https://asciinema.org/a/350800.svg)](https://asciinema.org/a/350800)-->
+[![asciicast](https://asciinema.org/a/360852.svg)](https://asciinema.org/a/360852)
 
 ### Description
 
@@ -46,6 +46,8 @@ cd -
 pip install -r requirements.txt
 python3 4anime.py --url https://4anime.to/anime/mob-psycho-100 --processes 5
 ```
+
+[![asciicast](https://asciinema.org/a/360851.svg)](https://asciinema.org/a/360851)
 
 ### Features
 - Fetches information about the anime, title, desc, etc.
