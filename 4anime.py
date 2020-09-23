@@ -140,7 +140,11 @@ def main():
 			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
 				executor.map(downloadEpisodes, commands, [directory] * len(commands))
 
+			print()
+
 			write(var = "#", text = "Verfying anime episodes downloaded! ...")
+
+			print()
 
 			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
 				executor.map(downloadEpisodes, commands, [directory] * len(commands))
