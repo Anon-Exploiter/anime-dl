@@ -36,18 +36,30 @@ Python3 script to download subbed animes from 4anime-dl (the site with best qual
 - Pop! OS 18.04 LTS
 - ~Windows~
 
-### Installing/Usage
+### Installation
 ```bash
 mkdir env && cd env
 python3 -m venv . 
 source bin/activate 
 cd -
-
 pip install -r requirements.txt
-python3 4anime.py --url https://4anime.to/anime/mob-psycho-100 --processes 5
+
+sudo apt-get update && sudo apt-get install -y aria2
 ```
 
 [![asciicast](https://asciinema.org/a/360856.svg)](https://asciinema.org/a/360856)
+
+### Usage
+
+Downloading a series with five parallel processes
+```
+python3 4anime.py --url https://4anime.to/anime/mob-psycho-100 --processes 5
+```
+
+Starting the series from a specific point (i.e. from 138th episode till end)
+```
+python3 4anime.py --url https://4anime.to/anime/black-clover -p 10 -s 138
+```
 
 ### Features
 - Fetches information about the anime, title, desc, etc.
@@ -55,6 +67,7 @@ python3 4anime.py --url https://4anime.to/anime/mob-psycho-100 --processes 5
 - Fetches all episodes' direct download links
 - Creates directory from the parsed episode details
 - Downloads and places all the courses inside the anime (name) folder
+- Start downloading from a specific episode
 
 ### Features (not-supported/todos)
 - Continuing from a specific episode
@@ -67,4 +80,5 @@ Feel free to file a issue or create a PR for that issue if you come across any.
 ### Changelog
 | Changes                                                                                                   | Release                                             |
 | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| Second release allowing user to start from a specific episode                     | 0.2 - 23-09-2020                                    |
 | Initial release only integrating downloading of anime episodes from google appspot application (-> Dies Irae fails)                     | 0.1 - 21-09-2020                                    |
