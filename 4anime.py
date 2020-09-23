@@ -126,7 +126,7 @@ def main():
 
 			if args.start:
 				startAt 	= int(args.start)
-				episodes 	= episodes[startAt:]
+				episodes 	= episodes[startAt - 1:]
 
 			# for eps in episodes.items():
 			# 	parseEpisodeLink(eps[0], eps[1])
