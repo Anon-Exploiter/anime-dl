@@ -17,6 +17,9 @@ def addArguments():
 	basicFuncs.add_argument('-u', '--url', 			action="store", 	dest="url", 		default=False, 		help='URL of Anime to download')	
 	basicFuncs.add_argument('-p', '--processes', 	action="store", 	dest="p", 			default=False, 		help='Parallel downloading processes')	
 
+	opts 		= parser.add_argument_group(f'Arguments')
+	opts.add_argument('-s', '--start', 				action="store", 	dest="start", 		default=False, 		help='Where to start from? (i.e. from 100)')
+
 	args = parser.parse_args()
 	return(args, parser)
 
@@ -120,6 +123,10 @@ def main():
 			
 			episodes, directory = getEpisodesLinks(legitURL[1])
 			createCourseDirectory(directory)
+
+			if args.start:
+				startAt 	= int(args.start)
+				episodes 	= episodes[startAt:]
 
 			# for eps in episodes.items():
 			# 	parseEpisodeLink(eps[0], eps[1])
