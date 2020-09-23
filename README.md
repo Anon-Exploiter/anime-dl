@@ -77,6 +77,9 @@ python3 4anime.py --url https://4anime.to/anime/black-clover -p 10 -s 138
 ### Filing Bugs/Contribution
 Feel free to file a issue or create a PR for that issue if you come across any.
 
+### Sum screenshots pls
+<img src="https://i.imgur.com/Sh0j6qV.png" />
+
 ### Changelog
 | Changes                                                                                                   | Release                                             |
 | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
