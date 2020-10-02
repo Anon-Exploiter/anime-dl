@@ -70,7 +70,7 @@ python3 4anime.py --url https://4anime.to/anime/black-clover -p 10 -s 138
 - Start downloading from a specific episode
 
 ### Features (not-supported/todos)
-- Continuing from a specific episode
+- ~Continuing from a specific episode~ (completed)
 - Ending on a specific episode
 - Downloading only a specific episode
 
