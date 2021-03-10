@@ -15,7 +15,7 @@ def addArguments():
 
 	basicFuncs 	= parser.add_argument_group(f'Input required')
 	basicFuncs.add_argument('-u', '--url', 			action="store", 	dest="url", 		default=False, 		help='URL of Anime to download')	
-	basicFuncs.add_argument('-p', '--processes', 	action="store", 	dest="p", 			default=False, 		help='Parallel downloading processes')	
+	# basicFuncs.add_argument('-p', '--processes', 	action="store", 	dest="p", 			default=False, 		help='Parallel downloading processes')	
 
 	opts 		= parser.add_argument_group(f'Arguments')
 	opts.add_argument('-s', '--start', 				action="store", 	dest="start", 		default=False, 		help='Where to start from? (i.e. from 100)')
@@ -80,9 +80,17 @@ def parseEpisodeLink(link):
 	soup 			= BeautifulSoup(responseText, 'html.parser')
 
 	title 			= soup.find('title').text
-	ddl 			= soup.find('source')['src']
 
-	# command 		= f"aria2c -s 10 -j 10 -x 16 --file-allocation=none -c  -o '{title}.mp4' '{ddl}'"
+	# They changed the implementation, and are changing the hostname of the subdomain in runtime using JS, files weren't being downloaded. 
+	# Probably to trick scripts :P
+
+	# Before: 	https://mountainoservoo002.animecdn.com/Black-Clover/Black-Clover-Episode-2-1080p.mp4
+	# After: 	https://mountainoservo0002.animecdn.com/Black-Clover/Black-Clover-Episode-2-1080p.mp4
+
+	# The replacement below fixes that issue and proceeds with downloading of files!
+
+	ddl 			= soup.find('source')['src'].replace('mountainoservoo002', 'mountainoservo0002')
+
 	print(title, ddl)
 	return(title, ddl)
 
@@ -97,14 +105,15 @@ def downloadEpisodes(command, directory):
 		command = ""
 
 	else:
-		command 	= f"aria2c -s 10 -j 10 -x 16 --file-allocation=none -c -o '{fileName}' '{ddl}'"
+		# Changing threads to 5 since the server returns error on 16 connections at once. Also, on 5 speed is better than 16, I think they limit your speed based on the connections you're making. 
+		command 	= f"aria2c -s 10 -j 10 -x 5 --file-allocation=none -c -o '{fileName}' '{ddl}'"
 		print(command)
 
 	os.system(command)
 
 def main():
 	PPROCESSES 	= 10 		# Parsing Processes
-	DPROCESSES 	= 2 		# Downloading Processes
+	DPROCESSES 	= 1 		# Downloading Processes
 
 	args, parser = addArguments()
 
@@ -113,8 +122,8 @@ def main():
 		bar 		= "-" * 70
 		commands 	= []
 
-		if args.p:
-			DPROCESSES 	= int(args.p)
+		# if args.p:
+		# 	DPROCESSES 	= int(args.p)
 
 		legitURL 	= checkAnimeURL(url)
 
