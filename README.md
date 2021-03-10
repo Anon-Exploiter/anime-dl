@@ -83,5 +83,5 @@ Feel free to file a issue or create a PR for that issue if you come across any.
 ### Changelog
 | Changes                                                                                                   | Release                                             |
 | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| Second release allowing user to start from a specific episode                     | 2.0 - 23-09-2020                                    |
-| Initial release only integrating downloading of anime episodes from google appspot application (-> Dies Irae fails)                     | 1.0 - 21-09-2020                                    |
+| Second release allowing user to start from a specific episode                     | 0.2 - 23-09-2020                                    |
+| Initial release only integrating downloading of anime episodes from google appspot application (-> Dies Irae fails)                     | 0.1 - 21-09-2020                                    |
