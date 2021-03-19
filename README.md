@@ -13,7 +13,7 @@
 
 Python3 script to download subbed animes from 4anime & gogoanime.ai (the sites with best quality i.e. 1080p)
 
-[![asciicast](https://asciinema.org/a/360854.svg)](https://asciinema.org/a/360854)
+[![asciicast](https://asciinema.org/a/400635.svg)](https://asciinema.org/a/400635)
 
 ### Description
 
@@ -47,8 +47,6 @@ pip install -r requirements.txt
 
 sudo apt-get update && sudo apt-get install -y aria2
 ```
-
-[![asciicast](https://asciinema.org/a/360856.svg)](https://asciinema.org/a/360856)
 
 ### Usage
 
