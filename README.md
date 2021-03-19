@@ -17,7 +17,7 @@ Python3 script to download subbed animes from 4anime & gogoanime.ai (the sites w
 
 ### Description
 
-Anime-dl anime downloader requires **Python3** and **aria2** (for working/parsing/downloading). ( ͡° ͜ʖ ͡°)
+Anime-dl requires **Python3** and **aria2** (for working/parsing/downloading). ( ͡° ͜ʖ ͡°)
 
 It automates everything, all you've to do is to pass whichever anime you want to download and it'll fetch all the **episodes**, their **DDLs**, create a new directory with anime as the name, use **aria2c** to download **2 episodes in parallel** by default. (customizable config with usage of `-p` arg) 
 
