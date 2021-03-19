@@ -79,7 +79,7 @@ python3 anime-dl.py --url https://gogoanime.ai/category/black-clover-tv -p 5 -s 
 Feel free to file a issue or create a PR for that issue if you come across any.
 
 ### Sum screenshots pls
-<img src="https://i.imgur.com/Sh0j6qV.png" />
+<img src="https://i.imgur.com/JqOyw9t.png" />
 
 ### Changelog
 | Changes                                                                                                                                   | Release                                             |
