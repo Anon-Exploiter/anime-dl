@@ -24,6 +24,7 @@ It automates everything, all you've to do is to pass whichever anime you want to
 ### Where do I get anime list?
 
 **Anime list (4anime.to):** https://4anime.to/browse
+
 **Anime list (gogoanime.ai):** https://gogoanime.ai/anime-list.html
 
 ### Requirements (to be installed)
