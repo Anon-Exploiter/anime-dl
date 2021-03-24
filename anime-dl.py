@@ -9,6 +9,9 @@ import re
 import urllib.parse
 import sys
 import json
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def write(var = "!", text = "test"):
 	print(f"[{var}] {text}")
@@ -232,22 +235,62 @@ def parseGogoAnimeBeDLinks(link):
 	# print(episodeId)
 
 	dlLink 			= f"https://vidstream.pro/info/{episodeId}?domain=gogoanime.be&skey=db04c5540929bebd456b9b16643fc436"
-	dlLinkResponse 	= requests.get(dlLink, headers = {'Referer': 'https://gogoanime.be/'})
+	
+	dlLinkResponse 	= requests.get(dlLink,
+		headers 	= {
+			'Referer': 'https://gogoanime.be/'
+		},
+		# proxies 	= {
+		# 	'http': '127.0.0.1:8080',
+		# 	'https': '127.0.0.1:8080',
+		# },
+		# verify 		= False
+	)
 
-	jsonData 		= json.loads(dlLinkResponse.text)
-	# print(jsonData)
+	if dlLinkResponse.status_code == 200:
+		jsonData 		= json.loads(dlLinkResponse.text)
+		# print(jsonData)
 
-	for links in jsonData['media']['sources']:
-		downloadLink = links['file']
-		break 
+		downloadLink = jsonData['media']['sources'][0]['file']
 
-	write('*', f'{episodeId} | {link} | {downloadLink}')
-	return(link, downloadLink)
+		if ".m3u8" in downloadLink:
+			ddl 	= jsonData['media']['download']
+			token 	= BeautifulSoup(requests.get(ddl).text, 'html.parser').find('input', {'type': 'hidden', 'name': 'token'})['value']
+			
+			resp 	= requests.post(ddl,
+				data 		= {
+					'token': token
+				},
+				headers 	= {
+					'Referer': ddl
+				},
+				allow_redirects = False,
+				# proxies 	= {
+				# 	'http': '127.0.0.1:8080',
+				# 	'https': '127.0.0.1:8080',
+				# },
+				# verify 			= False,
+			)
 
-def downloadGogoAnimeBeEpisodes(title, ddl):
+			soup 			= BeautifulSoup(resp.text, 'html.parser')
+			downloadLink 	= soup.find('a')['href']
+			# print(downloadLink)
+
+		write('*', f'{episodeId} | {link} | {downloadLink[:120]} ...')
+		return(link, downloadLink)
+
+	else:
+		print()
+		write('!', f'Episode not found on server | {episodeId} | {link} | Please download this manually! >_< ...')
+		print()
+		return('', '')
+
+def downloadGogoAnimeBeEpisodes(title, ddl, singleEpisode=False):
 	title 		= title.split("/")[::-1][1]
 	gtitle 		= " ".join(title.split('-episode-')[0].split("-")[:-1]).capitalize()
 	directory 	= gtitle.split('-episode-')[0]
+
+	print(title, gtitle, directory)
 
 	createCourseDirectory(directory)
 
@@ -377,29 +420,44 @@ def main():
 			goTitles 	= []
 			goLinks 	= []
 
-			# For downloading whole series
-			print("[%] Downloading series ...\n")
+			if "-episode-" not in url:
+				# For downloading whole series
+				print("[%] Downloading series ...\n")
+				
+				epLinks 	= parseGogoanimeBeSeries(url)
+
+				print()
+
+				if args.start:
+					startAt 	= int(args.start)
+					epLinks 	= epLinks[startAt - 1:]
+
+				# for links in epLinks:
+				# 	parseGogoAnimeBeDLinks(links)
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parseGogoAnimeBeDLinks, epLinks):
+						goTitles.append(results[0])
+						goLinks.append(results[1])
+
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
 			
-			epLinks 	= parseGogoanimeBeSeries(url)
+			else:
+				# For downloading a single episode
+				print("[%] Downloading single episode ...\n")
 
-			print()
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parseGogoAnimeBeDLinks, [url]):
+						goTitles.append(results[0])
+						goLinks.append(results[1])
 
-			if args.start:
-				startAt 	= int(args.start)
-				epLinks 	= epLinks[startAt - 1:]
+				print()
 
-			# for links in epLinks:
-			# 	parseGogoAnimeBeDLinks(links)
-
-			with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
-				for results in executor.map(parseGogoAnimeBeDLinks, epLinks):
-					goTitles.append(results[0])
-					goLinks.append(results[1])
-
-			print()
-
-			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
 
 		else:
 			parser.print_help()
