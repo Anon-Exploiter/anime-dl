@@ -8,17 +8,18 @@ import argparse
 import re
 import urllib.parse
 import sys
+import json
 
 def write(var = "!", text = "test"):
 	print(f"[{var}] {text}")
 
 def addArguments():
-	parser 		= argparse.ArgumentParser(description='', usage=f'\r-------------------------------------------------\n\tAnime Downloader\n-------------------------------------------------\n\n[#] Usage: python3 anime-dl.py --url https://4anime.to/anime/jujutsu-kaisen-tv | https://gogoanime.ai/category/jujutsu-kaisen-tv')
+	parser 		= argparse.ArgumentParser(description='', usage=f'\r-------------------------------------------------\n\tAnime Downloader\n-------------------------------------------------\n\n[#] Usage: python3 anime-dl.py --url https://gogoanime.ai/category/jujutsu-kaisen-tv | https://4anime.to/anime/jujutsu-kaisen-tv')
 	parser._optionals.title = "Basic Help"
 
 	basicFuncs 	= parser.add_argument_group(f'Input required')
 	basicFuncs.add_argument('-u', '--url', 			action="store", 	dest="url", 		default=False, 		help='URL of Anime to download')	
-	basicFuncs.add_argument('-p', '--processes', 	action="store", 	dest="p", 			default=False, 		help='Parallel downloading processes')	
+	basicFuncs.add_argument('-p', '--processes', 	action="store", 	dest="p", 			default=False, 		help='Parallel downloading processes')
 
 	opts 		= parser.add_argument_group(f'Arguments')
 	opts.add_argument('-s', '--start', 				action="store", 	dest="start", 		default=False, 		help='Where to start from? (i.e. from 95)')
@@ -37,9 +38,8 @@ def createCourseDirectory(name):
 	if not(os.path.isdir(courseDir)):
 		os.mkdir(courseDir)
 
-def getEpisodesLinks(url):
+def get4animeEpisodesLinks(url):
 	returnData 			= []
-
 	response 			= requests.get(url)
 
 	if response.status_code == 200:
@@ -68,11 +68,11 @@ def getEpisodesLinks(url):
 	else:
 		write(var = "!", text = "There was a problem fetching the episodes")
 
-def parseEpisodeLink(link):
+def parse4animeEpisodeLink(link):
 	response 		= requests.get(link)
 
 	while response.status_code != 200:
-		response 		= requests.get(link)
+		response 	= requests.get(link)
 	
 	responseText	= response.text
 	soup 			= BeautifulSoup(responseText, 'html.parser')
@@ -92,7 +92,7 @@ def parseEpisodeLink(link):
 	write('*', f'{title} {ddl}')
 	return(title, ddl)
 
-def downloadEpisodes(command, directory):
+def download4animeEpisodes(command, directory):
 	title 		= command[0].replace(' ', '_')
 	ddl 		= command[1]
 
@@ -197,36 +197,108 @@ def downloadGogoEpisodes(title, ddl):
 
 	os.system(command)
 
+def parseGogoanimeBeSeries(url):
+	epLinks 	= []
+	response 	= requests.get(url)
+
+	if response.status_code == 200:
+		soup 		= BeautifulSoup(response.text, 'html.parser')
+		animeLinks	= soup.find_all('a', {'class': 'nav-link btn btn-sm btn-secondary eps-item'})
+
+		for tags in animeLinks:
+			links 	= tags['href']
+			epLinks.append(links)
+
+		animeTitle 	= soup.find('h1').text
+		description = soup.find_all('div', {'class': 'description'})[0].text
+
+		write("*", f"Title: {animeTitle}")
+		write("&", f"Total Episodes: {len(epLinks)}")
+		write("$", f"Description: {description[:60]} ...")
+
+		return(epLinks)
+
+	else:
+		print(f"[!] There are some issues parsing the link ({url})")
+
+def parseGogoAnimeBeDLinks(link):
+	downloadLink 	= ''
+	response 		= requests.get(link).text
+
+	soup 			= BeautifulSoup(response, 'html.parser')
+	dlLink 			= soup.find_all('a', {'class': 'nav-link btn btn-sm btn-secondary link-item'})[0]['data-embed']
+
+	episodeId 		= re.findall(r'.*/e/(.*?)\?domain=.*', dlLink)[0]
+	# print(episodeId)
+
+	dlLink 			= f"https://vidstream.pro/info/{episodeId}?domain=gogoanime.be&skey=db04c5540929bebd456b9b16643fc436"
+	dlLinkResponse 	= requests.get(dlLink, headers = {'Referer': 'https://gogoanime.be/'})
+
+	jsonData 		= json.loads(dlLinkResponse.text)
+	# print(jsonData)
+
+	for links in jsonData['media']['sources']:
+		downloadLink = links['file']
+		break 
+
+	write('*', f'{episodeId} | {link} | {downloadLink}')
+	return(link, downloadLink)
+
+def downloadGogoAnimeBeEpisodes(title, ddl):
+	title 		= title.split("/")[::-1][1]
+	gtitle 		= " ".join(title.split('-episode-')[0].split("-")[:-1]).capitalize()
+	directory 	= gtitle.split('-episode-')[0]
+
+	createCourseDirectory(directory)
+
+	fileName 	= f"{directory}/{title}.mp4"
+
+	if os.path.isfile(fileName) and not(os.path.isfile(f"{fileName}.aria2")):
+		write(var="#", text=f'{fileName} already exists!')
+		command = ""
+
+	else:
+		command 	= f"aria2c -s 10 -j 10 -x 16 --file-allocation=none -c -o '{fileName}' '{ddl}'"
+		write(var="$", text=command)
+
+	os.system(command)
+
 def main():
 	PPROCESSES 	= 10 		# Parsing Processes
 	DPROCESSES 	= 1 		# Downloading Processes
 
 	args, parser = addArguments()
 
-	gogoAnime 		= ''
-	fourAnime 		= ''
+	gogoAnimeAi = ''
+	gogoAnimeBe = ''
+	fourAnime 	= ''
 
 	if args.url:
 		url 		= args.url
 		commands 	= []
 
 		if "gogoanime.ai" in url:
-			gogoAnime 	= True
+			gogoAnimeAi = True
+
+		elif "gogoanime.be" in url:
+			gogoAnimeBe	= True
 
 		else:
 			fourAnime 	= True
 
+		###
+
 		if args.p:
 			DPROCESSES 	= int(args.p)
 
-		if url and fourAnime:
+		if fourAnime:
 			write(var = "#", text = "Fetching 4anime's anime ...\n")
 
 			if args.p:
 				write(var = "!", text = "4anime doesn't support multiple episodes download at once -- Please remove -p argument or try gogoanime")
 				exit()
 			
-			episodes, directory = getEpisodesLinks(url)
+			episodes, directory = get4animeEpisodesLinks(url)
 			createCourseDirectory(directory)
 
 			if args.start:
@@ -234,16 +306,16 @@ def main():
 				episodes 	= episodes[startAt - 1:]
 
 			# for eps in episodes.items():
-			# 	parseEpisodeLink(eps[0], eps[1])
+			# 	parse4animeEpisodeLink(eps[0], eps[1])
 
 			with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
-				for results in executor.map(parseEpisodeLink, episodes):
+				for results in executor.map(parse4animeEpisodeLink, episodes):
 					commands.append(results)
 
 			print()
 
 			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(downloadEpisodes, commands, [directory] * len(commands))
+				executor.map(download4animeEpisodes, commands, [directory] * len(commands))
 
 			print()
 
@@ -252,9 +324,9 @@ def main():
 			print()
 
 			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(downloadEpisodes, commands, [directory] * len(commands))
+				executor.map(download4animeEpisodes, commands, [directory] * len(commands))
 
-		elif url and gogoAnime:
+		elif gogoAnimeAi:
 			write(var = "#", text = "Fetching gogoanime's anime ...\n")
 
 			goTitles 	= []
@@ -262,7 +334,7 @@ def main():
 
 			if "-episode-" not in url:
 				# For downloading whole series
-				print("\n[%] Downloading series ...\n")
+				print("[%] Downloading series ...\n")
 				
 				epLinks 	= parseGogoAnimeAi(url)
 
@@ -298,6 +370,36 @@ def main():
 
 				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
 					executor.map(downloadGogoEpisodes, goTitles, goLinks)
+
+		elif gogoAnimeBe:
+			write(var = "#", text = "Fetching Gogoanime.be's Anime ...\n")
+
+			goTitles 	= []
+			goLinks 	= []
+
+			# For downloading whole series
+			print("[%] Downloading series ...\n")
+			
+			epLinks 	= parseGogoanimeBeSeries(url)
+
+			print()
+
+			if args.start:
+				startAt 	= int(args.start)
+				epLinks 	= epLinks[startAt - 1:]
+
+			# for links in epLinks:
+			# 	parseGogoAnimeBeDLinks(links)
+
+			with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+				for results in executor.map(parseGogoAnimeBeDLinks, epLinks):
+					goTitles.append(results[0])
+					goLinks.append(results[1])
+
+			print()
+
+			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+				executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
 
 		else:
 			parser.print_help()
