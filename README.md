@@ -82,6 +82,9 @@ Feel free to file a issue or create a PR for that issue if you come across any.
 ### Sum screenshots pls
 <img src="https://i.imgur.com/JqOyw9t.png" />
 
+### Todos (if anyone wants to contribute):
+- https://github.com/Anon-Exploiter/anime-dl/projects/1
+
 ### Changelog
 | Changes                                                                                                                                   | Release                                             |
 | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
