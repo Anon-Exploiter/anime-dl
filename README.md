@@ -52,15 +52,20 @@ sudo apt-get update && sudo apt-get install -y aria2
 ### Usage
 
 Downloading a series with (no and) five parallel processes
-```
-python3 anime-dl.py --url https://4anime.to/anime/mob-psycho-100
+```bash
 python3 anime-dl.py --url https://gogoanime.ai/category/mob-psycho-100 -p 5
+python3 anime-dl.py --url https://4anime.to/anime/mob-psycho-100
 ```
 
 Starting the series from a specific point (i.e. from 138th episode till end)
-```
-python3 anime-dl.py --url https://4anime.to/anime/black-clover -s 138
+```bash
 python3 anime-dl.py --url https://gogoanime.ai/category/black-clover-tv -p 5 -s 140
+python3 anime-dl.py --url https://4anime.to/anime/black-clover -s 138
+```
+
+Downloading a single episode
+```bash
+python3 anime-dl.py --url https://gogoanime.ai/jujutsu-kaisen-tv-episode-23
 ```
 
 ### Features
