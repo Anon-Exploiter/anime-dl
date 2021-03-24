@@ -444,6 +444,13 @@ def main():
 
 				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
 					executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
+
+				write(var = "#", text = "Verfying anime episodes downloaded! ...")
+
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(downloadGogoAnimeBeEpisodes, goTitles, goLinks)
 			
 			else:
 				# For downloading a single episode
