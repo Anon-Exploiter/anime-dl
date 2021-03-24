@@ -260,26 +260,44 @@ def main():
 			goTitles 	= []
 			goLinks 	= []
 
-			epLinks 	= parseGogoAnimeAi(url)
+			if "-episode-" not in url:
+				# For downloading whole series
+				print("\n[%] Downloading series ...\n")
+				
+				epLinks 	= parseGogoAnimeAi(url)
 
-			print()
+				print()
 
-			if args.start:
-				startAt 	= int(args.start)
-				epLinks 	= epLinks[startAt - 1:]
+				if args.start:
+					startAt 	= int(args.start)
+					epLinks 	= epLinks[startAt - 1:]
 
-			# for links in epLinks:
-			# 	parseGogoAnimeLinks(links)
+				# for links in epLinks:
+				# 	parseGogoAnimeLinks(links)
 
-			with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
-				for results in executor.map(parseGogoAnimeDLinks, epLinks):
-					goTitles.append(results[0])
-					goLinks.append(results[1])
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parseGogoAnimeDLinks, epLinks):
+						goTitles.append(results[0])
+						goLinks.append(results[1])
 
-			print()
+				print()
 
-			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(downloadGogoEpisodes, goTitles, goLinks)
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(downloadGogoEpisodes, goTitles, goLinks)
+
+			else:
+				# For downloading a single episode
+				print("[%] Downloading single episode ...\n")
+				
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parseGogoAnimeDLinks, [url]):
+						goTitles.append(results[0])
+						goLinks.append(results[1])
+
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(downloadGogoEpisodes, goTitles, goLinks)
 
 		else:
 			parser.print_help()
