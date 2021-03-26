@@ -99,14 +99,16 @@ def download4animeEpisodes(command, directory):
 	title 		= command[0].replace(' ', '_')
 	ddl 		= command[1]
 
-	fileName 	= f"{directory}/{title}.mp4"
+	if directory != False:
+		fileName 	= f"{directory}/{title}.mp4"
+
+	else:
+		fileName 	= f"{title}.mp4"
 
 	mountainSrvResponse = requests.get(ddl, headers = {'Range': 'bytes=0-15'})
 
 	if mountainSrvResponse.status_code == 404:
 		ddl 		= f'https://v6.4animu.me/{"/".join(ddl.split("/")[3:])}'
-
-	# 
 
 	if os.path.isfile(fileName) and not(os.path.isfile(f"{fileName}.aria2")):
 		write(var="#", text=f'{fileName} already exists!')
@@ -346,34 +348,55 @@ def main():
 			if args.p:
 				write(var = "!", text = "4anime doesn't support multiple episodes download at once -- Please remove -p argument or try gogoanime")
 				exit()
-			
-			episodes, directory = get4animeEpisodesLinks(url)
-			createCourseDirectory(directory)
 
-			if args.start:
-				startAt 	= int(args.start)
-				episodes 	= episodes[startAt - 1:]
+			if "-episode-" not in url:
+				episodes, directory = get4animeEpisodesLinks(url)
+				createCourseDirectory(directory)
 
-			# for eps in episodes.items():
-			# 	parse4animeEpisodeLink(eps[0], eps[1])
+				if args.start:
+					startAt 	= int(args.start)
+					episodes 	= episodes[startAt - 1:]
 
-			with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
-				for results in executor.map(parse4animeEpisodeLink, episodes):
-					commands.append(results)
+				# for eps in episodes.items():
+				# 	parse4animeEpisodeLink(eps[0], eps[1])
 
-			print()
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parse4animeEpisodeLink, episodes):
+						commands.append(results)
+						print(results)
 
-			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(download4animeEpisodes, commands, [directory] * len(commands))
+				print()
 
-			print()
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(download4animeEpisodes, commands, [defDir] * len(commands), [directory] * len(commands))
 
-			write(var = "#", text = "Verfying anime episodes downloaded! ...")
+				print()
 
-			print()
+				write(var = "#", text = "Verfying anime episodes downloaded! ...")
 
-			with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
-				executor.map(download4animeEpisodes, commands, [directory] * len(commands))
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(download4animeEpisodes, commands, [directory] * len(commands))
+
+			else:
+				# Downloading single episode
+				directory 	= False
+
+				print()
+
+				write(var = "%", text = "Downloading single episode! ...")
+
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = PPROCESSES) as executor:
+					for results in executor.map(parse4animeEpisodeLink, [url]):
+						commands.append(results)
+
+				print()
+
+				with concurrent.futures.ProcessPoolExecutor(max_workers = DPROCESSES) as executor:
+					executor.map(download4animeEpisodes, commands, [directory] * len(commands))
 
 		elif gogoAnimeAi:
 			write(var = "#", text = "Fetching gogoanime's anime ...\n")
