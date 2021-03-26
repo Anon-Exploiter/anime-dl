@@ -21,6 +21,8 @@ Anime-dl requires **Python3** and **aria2** (for working/parsing/downloading). (
 
 It automates everything, all you've to do is to pass whichever anime you want to download and it'll fetch all the **episodes**, their **DDLs**, create a new directory with anime as the name, use **aria2c** to download **2 episodes in parallel** by default. (customizable config with usage of `-p` arg) 
 
+##### Please note that 4anime.to doesn't support sometimes downloading of old animes! Better to switch onto gogoanime.ai or gogoanime.be
+
 ### Where do I get anime list?
 
 **Anime list (4anime.to):** https://4anime.to/browse
