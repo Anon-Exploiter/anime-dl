@@ -101,12 +101,18 @@ def download4animeEpisodes(command, directory):
 
 	fileName 	= f"{directory}/{title}.mp4"
 
+	mountainSrvResponse = requests.get(ddl, headers = {'Range': 'bytes=0-15'})
+
+	if mountainSrvResponse.status_code == 404:
+		ddl 		= f'https://v6.4animu.me/{"/".join(ddl.split("/")[3:])}'
+
+	# 
+
 	if os.path.isfile(fileName) and not(os.path.isfile(f"{fileName}.aria2")):
 		write(var="#", text=f'{fileName} already exists!')
 		command = ""
 
 	else:
-		# Changing threads to 5 since the server returns error on 16 connections at once. Also, on 5 speed is better than 16, I think they limit your speed based on the connections you're making. 
 		command 	= f"aria2c -s 10 -j 10 -x 5 --file-allocation=none -c -o '{fileName}' '{ddl}'"
 		write(var="&", text=command)
 
@@ -335,7 +341,7 @@ def main():
 			DPROCESSES 	= int(args.p)
 
 		if fourAnime:
-			write(var = "#", text = "Fetching 4anime's anime ...\n")
+			write(var = "#", text = "Fetching 4anime's anime ...")
 
 			if args.p:
 				write(var = "!", text = "4anime doesn't support multiple episodes download at once -- Please remove -p argument or try gogoanime")
