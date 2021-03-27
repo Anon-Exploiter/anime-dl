@@ -11,7 +11,7 @@
 [issues-shield]: https://img.shields.io/github/issues/Anon-Exploiter/anime-dl.svg?style=flat-square
 [issues-url]: https://github.com/Anon-Exploiter/anime-dl/issues
 
-Python3 script to download subbed animes from 4anime & gogoanime.ai (the sites with best quality i.e. 1080p)
+Python3 script to download subbed animes from 4anime.to, gogoanime.ai, and gogoanime.be (the sites with best quality i.e. 1080p)
 
 [![asciicast](https://asciinema.org/a/400635.svg)](https://asciinema.org/a/400635)
 
