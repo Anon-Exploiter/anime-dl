@@ -298,8 +298,6 @@ def downloadGogoAnimeBeEpisodes(title, ddl, singleEpisode=False):
 	gtitle 		= " ".join(title.split('-episode-')[0].split("-")[:-1]).capitalize()
 	directory 	= gtitle.split('-episode-')[0]
 
-	print(title, gtitle, directory)
-
 	createCourseDirectory(directory)
 
 	fileName 	= f"{directory}/{title}.mp4"
