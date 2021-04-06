@@ -29,6 +29,8 @@ It automates everything, all you've to do is to pass whichever anime you want to
 
 **Anime list (gogoanime.ai):** https://gogoanime.ai/anime-list.html
 
+**Anime list (gogoanime.be):** https://gogoanime.be/
+
 ### Requirements (to be installed)
 - aria2
 - python3
@@ -57,17 +59,20 @@ Downloading a series with (no and) five parallel processes
 ```bash
 python3 anime-dl.py --url https://gogoanime.ai/category/mob-psycho-100 -p 5
 python3 anime-dl.py --url https://4anime.to/anime/mob-psycho-100
+python3 anime-dl.py --url https://gogoanime.be/anime/mob-psycho-100-aE4/ -p 10
 ```
 
 Starting the series from a specific point (i.e. from 138th episode till end)
 ```bash
 python3 anime-dl.py --url https://gogoanime.ai/category/black-clover-tv -p 5 -s 140
 python3 anime-dl.py --url https://4anime.to/anime/black-clover -s 138
+python3 anime-dl.py --url https://gogoanime.be/anime/mob-psycho-100-aE4/ -s 5
 ```
 
 Downloading a single episode
 ```bash
 python3 anime-dl.py --url https://gogoanime.ai/jujutsu-kaisen-tv-episode-23
+python3 anime-dl.py --url https://gogoanime.be/watch/mob-psycho-100-aE4-episode-12/
 ```
 
 ### Features
