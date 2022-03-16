@@ -257,35 +257,18 @@ def parseGogoAnimeBeDLinks(link):
 
 	if dlLinkResponse.status_code == 200:
 		jsonData 		= json.loads(dlLinkResponse.text)
-		# print(jsonData)
-
 		downloadLink = jsonData['media']['sources'][0]['file']
 
 		if ".m3u8" in downloadLink:
-			ddl 	= jsonData['media']['download']
-			token 	= BeautifulSoup(requests.get(ddl).text, 'html.parser').find('input', {'type': 'hidden', 'name': 'token'})['value']
+			ddl = jsonData['media']['sources'][1]['file']
+			urlPrefix = "/".join(ddl.split("/")[:-1])
 			
-			resp 	= requests.post(ddl,
-				data 		= {
-					'token': token
-				},
-				headers 	= {
-					'Referer': ddl
-				},
-				allow_redirects = False,
-				# proxies 	= {
-				# 	'http': '127.0.0.1:8080',
-				# 	'https': '127.0.0.1:8080',
-				# },
-				# verify 			= False,
-			)
+			dlLinks = requests.get(ddl).text
+			ffmpegLink = re.findall(r'hls\/.*', dlLinks)[0]
+			m3u8_url = f"{urlPrefix}/{ffmpegLink}"
 
-			soup 			= BeautifulSoup(resp.text, 'html.parser')
-			downloadLink 	= soup.find('a')['href']
-			# print(downloadLink)
-
-		write('*', f'{episodeId} | {link} | {downloadLink[:120]} ...')
-		return(link, downloadLink)
+		write('*', f'{episodeId} | {link} | {m3u8_url[:120]} ...')
+		return(link, m3u8_url)
 
 	else:
 		print()
@@ -307,7 +290,7 @@ def downloadGogoAnimeBeEpisodes(title, ddl, singleEpisode=False):
 		command = ""
 
 	else:
-		command 	= f"aria2c -s 10 -j 10 -x 16 --file-allocation=none -c -o '{fileName}' '{ddl}'"
+		command 	= f"ffmpeg -i '{ddl}' -c copy '{fileName}'"
 		write(var="$", text=command)
 
 	os.system(command)
